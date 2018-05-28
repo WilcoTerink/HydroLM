@@ -1,6 +1,6 @@
 {% set name = "HydroLM" %}
-{% set version = "1.0.1" %}
-{% set sha256 = "7e5a4984c18f64ebeb26e6a9366e7b61d30aeaede66598ab72b3fd23facb5e9c" %}
+{% set version = "1.0.3" %}
+{% set sha256 = "12b785178519dbcf02fff946f802c7f9c54a8cde68816830be485bc6b1fc1752" %}
 
 # sha256 is the prefered checksum -- you can get it for a file with:
 #  `openssl sha256 <file name>`.
@@ -36,8 +36,11 @@ requirements:
     - setuptools
   run:
     - python
+    - numpy
     - pandas
     - statsmodels
+    - matplotlib
+    - scipy
 
 test:
   imports:

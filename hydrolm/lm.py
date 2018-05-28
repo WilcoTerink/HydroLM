@@ -29,9 +29,9 @@ class LM(object):
 
         Parameters
         ----------
-        x: DataFrame
+        x : DataFrame
             With header names as the variable names and can be with or without a DateTimeIndex.
-        y: DataFrame
+        y : DataFrame
             With header names as the variable names and can be with or without a DateTimeIndex.
 
         Returns
@@ -79,13 +79,13 @@ class LM(object):
 
         Parameters
         ----------
-        n_ind: int
+        n_ind : int
             Number of independent variables to choose from.
-        log_x: bool
+        log_x : bool
             Should the x variables be logged?
-        log_y: bool
+        log_y : bool
             Should the y variables be logged?
-        min_obs: int
+        min_obs : int
             Minimum number of combined x and y data to perform the OLS.
 
         Returns
@@ -124,7 +124,8 @@ class LM(object):
             combos = set(combinations(x_names, n_ind))
 
             models = {}
-            models_mae = {}
+#            models_mae = {}
+            fvalues_dict = {}
             xy_dict = {}
             for xi in combos:
                 x_set = list(xi)
@@ -141,14 +142,16 @@ class LM(object):
                 x_df = sm.add_constant(x_df)
                 model = sm.OLS(y_df, x_df).fit()
                 models.update({xi: model})
-                mae1 = eval_measures.rmse(model.predict(), y_df)
-                models_mae.update({np.round(mae1, 6): xi})
+                fvalues_dict.update({np.round(model.fvalue, 2): xi})
+#                mae1 = eval_measures.rmse(model.predict(), y_df)
+#                models_mae.update({np.round(mae1, 6): xi})
 
-            if not models_mae:
+            if not models:
                 print('Not enough data available for regression, returning None.')
                 return None
 
-            best_x = models_mae[np.min(list(models_mae.keys()))]
+#            best_x = models_mae[np.min(list(models_mae.keys()))]
+            best_x = fvalues_dict[np.max(list(fvalues_dict.keys()))]
             bestm = models[best_x]
             best1.update({yi: bestm})
 #            best_xy.update({yi: xy_dict[yi]})

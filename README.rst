@@ -11,10 +11,10 @@ Installation
 ------------
 ETo can be installed via pip or conda::
 
-  pip install hydrolm
+  pip install HydroLM
 
 or::
 
-  conda install -c mullenkamp hydrolm
+  conda install -c mullenkamp HydroLm
 
 The core dependency is `Pandas <http://pandas.pydata.org/pandas-docs/stable/>`_ and `statsmodels <https://www.statsmodels.org/stable/index.html>`_.
