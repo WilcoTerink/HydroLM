@@ -276,12 +276,12 @@ class LM(object):
         """
         plot_fun = getattr(sm.graphics, fun_name)
 
-        def single_plot(y, x):
+        def single_plot(y, x, **kwargs):
             """
 
             """
             if isinstance(y, str) & isinstance(x, str):
-                plot1 = plot_fun(self.sm[y], x)
+                plot1 = plot_fun(self.sm[y], x, **kwargs)
             return plot1
 
         return single_plot
@@ -292,12 +292,12 @@ class LM(object):
         """
         plot_fun = getattr(sm.graphics, fun_name)
 
-        def multi_plot(y):
+        def multi_plot(y, **kwargs):
             """
 
             """
             if isinstance(y, str):
-                plot1 = plot_fun(self.sm[y])
+                plot1 = plot_fun(self.sm[y], **kwargs)
             return plot1
 
         return multi_plot
