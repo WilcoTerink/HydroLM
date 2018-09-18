@@ -17,4 +17,4 @@ or::
 
   conda install -c mullenkamp HydroLm
 
-The core dependency is `Pandas <http://pandas.pydata.org/pandas-docs/stable/>`_ and `statsmodels <https://www.statsmodels.org/stable/index.html>`_.
+The core dependencies are `Pandas <http://pandas.pydata.org/pandas-docs/stable/>`_ and `statsmodels <https://www.statsmodels.org/stable/index.html>`_.
