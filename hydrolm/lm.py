@@ -18,7 +18,18 @@ multi_plots_names = ['plot_ccpr_grid', 'plot_partregress_grid', 'influence_plot'
 
 class LM(object):
     """
-    Class to handle predictive linear models. Only OLS is supported at the moment.
+    Class to handle predictive linear models. Only OLS and RLM are supported at the moment.
+
+    Parameters
+    ----------
+    x : DataFrame
+        With header names as the variable names and can be with or without a DateTimeIndex.
+    y : DataFrame
+        With header names as the variable names and can be with or without a DateTimeIndex.
+
+    Returns
+    -------
+    LM class
     """
 
     def __init__(self, x, y):
@@ -72,7 +83,7 @@ class LM(object):
         return n3
 
 
-    def run(self, model='ols', n_ind=1, x_transform=None, y_transform=None, min_obs=10):
+    def predict(self, model='ols', n_ind=1, x_transform=None, y_transform=None, min_obs=10):
         """
         Function to perform an OLS on the contained dataset.
 
@@ -82,7 +93,7 @@ class LM(object):
             The type of linear model to run. Options are ols and rlm.
         n_ind : int
             Number of independent variables to choose from.
-       x_transform : str or None
+        x_transform : str or None
             Should the x variables be transformed to be more normal? Options are either None, 'log', or 'boxcox'.
         y_transform : str or None
             Should the y variables be transformed to be more normal? Options are either None, 'log', or 'boxcox'.
