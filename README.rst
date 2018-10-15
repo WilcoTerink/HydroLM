@@ -9,7 +9,7 @@ The HydroLM package contains a class and functions for automating linear regress
 
 Installation
 ------------
-ETo can be installed via pip or conda::
+HydroLM can be installed via pip or conda::
 
   pip install HydroLM
 
