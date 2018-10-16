@@ -209,7 +209,6 @@ class LM(object):
                     y_lambda = boxcox_y_dict[best_x]
                     predict1 = special.inv_boxcox(predict1, y_lambda)
 
-
             xy_orig = xy_orig_dict[best_x].copy()
             xy_trans = xy_trans_dict[best_x].copy()
             xy_both = xy_orig.copy()
