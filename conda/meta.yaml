@@ -1,6 +1,6 @@
 {% set name = "HydroLM" %}
-{% set version = "1.0.5" %}
-{% set sha256 = "2cd26ff4c974f876dd6dbebf5feb6e75d07e69b301a3b94489836423196e8c96" %}
+{% set version = "1.0.6" %}
+{% set sha256 = "71d56d6a988b3ed7782e808d133f51a6c70012388bb692d1427008307de74da6" %}
 
 # sha256 is the prefered checksum -- you can get it for a file with:
 #  `openssl sha256 <file name>`.

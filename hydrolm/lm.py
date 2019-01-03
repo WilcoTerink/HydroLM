@@ -8,12 +8,14 @@ import pandas as pd
 from itertools import combinations
 from scipy import log, exp, mean, stats, special
 from statsmodels.tools import eval_measures
-from copy import copy
+from copy import copy as cp
+from hydrolm.util import autocorr_est, tsreg
 
 eval_measures_names = ['bias', 'iqr', 'maxabs', 'meanabs', 'medianabs', 'mse', 'rmse', 'stde', 'vare']
 neval_measures_names = ['meanabs', 'medianabs', 'mse', 'rmse']
 single_plots_names = ['plot_ccpr', 'plot_regress_exog', 'plot_fit']
 multi_plots_names = ['plot_ccpr_grid', 'plot_partregress_grid', 'influence_plot']
+cols = ['y', 'nrmse', 'mane', 'Adj R2', 'nobs', 'y range', 'f value', 'f p value', 'x sites', 'y intercept', 'x slopes']
 
 
 class LM(object):
@@ -67,14 +69,13 @@ class LM(object):
         self.y = y
         self.y_names = y_names
         self.x_names = x_names
-        self.copy = copy
+
+    def copy(self):
+        return cp(self)
 
     def __repr__(self):
-        if hasattr(self, 'sm'):
-            strr = ''
-            for i in self.sm:
-                strr = strr + repr(self.sm[i].summary())
-            return strr
+        if hasattr(self, 'summary_df'):
+            return repr(self.summary_df)
         else:
             return repr(pd.concat([self.x, self.y], axis=1))
 
@@ -82,8 +83,33 @@ class LM(object):
         n3 = self.sm[key].summary()
         return n3
 
+    def _summary_df(self):
+        sm1 = self.copy()
+        res_list = []
+        nrmse = sm1.nrmse()
+        mane = sm1.mane()
+        for y in sm1.sm:
+            if sm1.sm[y] is not None:
+                nrmse1 = nrmse[y]
+                mane1 = mane[y]
+                adjr2 = round(sm1.sm[y].rsquared_adj, 3)
+                nobs = sm1.sm[y].nobs
+                y_range = sm1.sm_xy[y]['y_orig'].max() - sm1.sm_xy[y]['y_orig'].min()
+                x_sites = ', '.join(sm1.sm_xy[y]['x_orig'].columns.tolist())
+                fvalue = round(sm1.sm[y].fvalue, 3)
+                fpvalue = round(sm1.sm[y].f_pvalue, 3)
+                params1 = sm1.sm[y].params.round(5).tolist()
+                intercept = params1[0]
+                x_slopes = ', '.join([str(i) for i in params1[1:]])
 
-    def predict(self, model='ols', n_ind=1, x_transform=None, y_transform=None, min_obs=10):
+                site_res = [y, nrmse1, mane1, adjr2, nobs, y_range, fvalue, fpvalue, x_sites, intercept, x_slopes]
+                res_list.append(site_res)
+        res_site = pd.DataFrame(res_list, columns=cols).set_index('y')
+
+        return res_site
+
+
+    def predict(self, model='ols', n_ind=1, x_transform=None, y_transform=None, min_obs=10, autocorr=None):
         """
         Function to perform an OLS on the contained dataset.
 
@@ -99,14 +125,20 @@ class LM(object):
             Should the y variables be transformed to be more normal? Options are either None, 'log', or 'boxcox'.
         min_obs : int
             Minimum number of combined x and y data to perform the OLS.
+        autocorr : float or None
+            The autocorrelation value that will be used to sample the data for the regression. This is meant to reduce the dependence in sucessive values. For example, if continuous time series is used as input, then there will be a strong dependent relationship between adjacent values. Setting an autocorr value will sample at a frequency to greatly reduce the interdependence. Recommended values would be 0.05 or 0.1 (depending on data availability).
 
         Returns
         -------
         LM class with Statsmodels results contained within.
         """
-        model1 = self.copy(self)
+        model1 = self.copy()
         y_names = model1.y_names
         x_names = model1.x_names
+
+        if isinstance(autocorr, float):
+            auto_dict = autocorr_est(model1.x, autocorr)
+            print(auto_dict)
 
         best1 = {}
 #        best_xy = {}
@@ -114,7 +146,7 @@ class LM(object):
         predict_dict = {}
         for yi in y_names:
             if model1.timeindex:
-                both1 = pd.concat([model1.x, model1.y[yi]], axis=1, join='inner')
+                both1 = tsreg(pd.concat([model1.x, model1.y[yi]], axis=1, join='inner'))
             else:
                 both1 = pd.concat([model1.x, model1.y[yi]], axis=1)
 
@@ -136,7 +168,11 @@ class LM(object):
                 x_set = list(xi)
                 full_set = list(x_set)
                 full_set.extend([yi])
-                xy_df1 = both1[full_set].dropna()
+                if isinstance(autocorr, float):
+                    auto1 = int(np.ceil(np.mean([auto_dict[i] for i in xi])))
+                    xy_df1 = both1[::(auto1-1)][full_set].dropna()
+                else:
+                    xy_df1 = both1[full_set].dropna()
                 if xy_df1.empty | (len(xy_df1) < min_obs):
                     continue
                 x_df = xy_df1[x_set]
@@ -235,6 +271,10 @@ class LM(object):
             setattr(model1, mp, model1._multi_plots_gen(mp))
 
         setattr(model1, 'mane', model1._mane_fun)
+
+        ### Create summary df
+        summ_df = model1._summary_df()
+        setattr(model1, 'summary_df', summ_df)
 
         ### Return
         return model1
