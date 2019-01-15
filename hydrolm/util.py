@@ -15,7 +15,8 @@ import numpy as np
 def autocorr_est(df, limit=0.05, nlags=400):
     auto_dict = {}
     for name, values in df.iteritems():
-        a1 = sm.tsa.stattools.acf(values, nlags=nlags, fft=True, missing='drop')
+        data = values[values.first_valid_index():values.last_valid_index()].fillna(0)
+        a1 = sm.tsa.stattools.acf(data, nlags=nlags, fft=True, missing='drop')
         days = np.argmax(a1 < limit)
         auto_dict.update({name: days})
     return auto_dict

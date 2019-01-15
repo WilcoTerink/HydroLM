@@ -17,7 +17,6 @@ single_plots_names = ['plot_ccpr', 'plot_regress_exog', 'plot_fit']
 multi_plots_names = ['plot_ccpr_grid', 'plot_partregress_grid', 'influence_plot']
 cols = ['y', 'nrmse', 'mane', 'Adj R2', 'nobs', 'y range', 'f value', 'f p value', 'x sites', 'y intercept', 'x slopes']
 
-
 class LM(object):
     """
     Class to handle predictive linear models. Only OLS and RLM are supported at the moment.
@@ -273,8 +272,9 @@ class LM(object):
         setattr(model1, 'mane', model1._mane_fun)
 
         ### Create summary df
-        summ_df = model1._summary_df()
-        setattr(model1, 'summary_df', summ_df)
+        if model == 'ols':
+            summ_df = model1._summary_df()
+            setattr(model1, 'summary_df', summ_df)
 
         ### Return
         return model1

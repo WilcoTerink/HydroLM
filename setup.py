@@ -10,7 +10,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 name = 'HydroLM'
 main_package = 'hydrolm'
 datasets = 'datasets'
-version = '1.0.6'
+version = '1.0.7'
 
 # The below code is for readthedocs. To have sphinx/readthedocs interact with
 # the contained package, readthedocs needs to build the package. But the dependencies
